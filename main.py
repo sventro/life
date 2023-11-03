@@ -22,9 +22,9 @@ def main():
 
 
 def draw_world(
-    screen: pygame.Surface, grid: Grid, rect: bool = False, circle: bool = True
+    screen: pygame.Surface, grid: Grid, rect: bool = True, circle: bool = False
 ) -> None:
-    border_size = 2
+    border_size = 1
     cell_width = screen.get_width() / grid.width
     cell_height = screen.get_height() / grid.height
     width = cell_width - border_size
@@ -39,8 +39,8 @@ def draw_world(
                 pygame.draw.rect(screen, cell.status.value, (left, top, width, height))
             if circle:
                 center = [
-                    x * cell_width + cell_width / 2 + border_size,
-                    y * cell_height + cell_height / 2 + border_size,
+                    x * cell_width + width / 2 + border_size,
+                    y * cell_height + height / 2 + border_size,
                 ]
                 radius = width / 2
                 pygame.draw.circle(screen, cell.status.value, center, radius)
