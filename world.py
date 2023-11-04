@@ -17,12 +17,13 @@ class Neighbors:
     dead: Cell
 
 
-def bound(value: int, low: int, high: int):
+def bound(value: int, low: int, high: int) -> int:
     return max(low, min(high, value))
 
 
 class World:
-    def __init__(self, dimensions: tuple[int, int], preset: bool = False):
+    def __init__(self, dimensions: tuple[int, int], stages: bool, preset: bool) -> None:
+        self.stages = stages
         Grid.width, Grid.height = dimensions
         Grid.cells = [
             [Cell(position=[row, column]) for row in range(Grid.width)]
@@ -33,24 +34,24 @@ class World:
         else:
             self.generate_random()
 
-    def generate_random(self):
+    def generate_random(self) -> None:
         for row in Grid.cells:
             for cell in row:
                 chance_number = randint(0, 3)
                 if chance_number == 1:
                     cell.status = Status.ALIVE
 
-    def generate_preset(self, preset: list[tuple[int, int]]):
+    def generate_preset(self, preset: list[tuple[int, int]]) -> None:
         for row in Grid.cells:
             for cell in row:
                 if cell.position in preset:
                     cell.status = Status.ALIVE
 
-    def update_cells(self):
+    def update_cells(self) -> None:
         dies: Cell = []
         born: Cell = []
-        for row in range(len(Grid.cells)):
-            for column in range(len(Grid.cells[row])):
+        for row, _ in enumerate(Grid.cells):
+            for column, _ in enumerate(Grid.cells[row]):
                 cell = Grid.cells[row][column]
                 neighbors = self.check_neighbors(row, column)
                 if cell.status == Status.BORN:
@@ -64,11 +65,11 @@ class World:
                     if len(neighbors.alive) == 3:
                         born.append(cell)
         for cell in dies:
-            cell.status = Status.DYING
+            cell.status = Status.DYING if self.stages else Status.DEAD
         for cell in born:
-            cell.status = Status.BORN
+            cell.status = Status.BORN if self.stages else Status.ALIVE
 
-    def check_neighbors(self, x: int, y: int):
+    def check_neighbors(self, x: int, y: int) -> Neighbors:
         offsets = [(-1, -1), (0, -1), (1, -1), (-1, 0), (1, 0), (-1, 1), (0, 1), (1, 1)]
         alive = []
         dead = []
