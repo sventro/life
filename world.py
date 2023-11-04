@@ -28,8 +28,8 @@ class World:
         self.stages = stages
         Grid.width, Grid.height = dimensions
         Grid.cells = [
-            [Cell(position=[row, column]) for row in range(Grid.width)]
-            for column in range(Grid.height)
+            [Cell(position=[row, column]) for column in range(Grid.height)]
+            for row in range(Grid.width)
         ]
         if preset:
             self.generate_preset(preset=preset)
@@ -77,8 +77,8 @@ class World:
         dead = []
         for offset in offsets:
             position = [
-                bound(value=x + offset[0], low=0, high=Grid.height - 1),
-                bound(value=y + offset[1], low=0, high=Grid.width - 1),
+                bound(value=x + offset[0], low=0, high=Grid.width - 1),
+                bound(value=y + offset[1], low=0, high=Grid.height - 1),
             ]
             neighbor = Grid.cells[position[0]][position[1]]
             if neighbor.status == Status.ALIVE or neighbor.status == Status.BORN:
