@@ -2,6 +2,12 @@ import pygame
 import time
 from world import World, Grid
 from cell import Cell
+from enum import Enum
+
+
+class Shape(Enum):
+    RECT: str = "rect"
+    CIRCLE: str = "circle"
 
 
 def main() -> None:
@@ -16,14 +22,14 @@ def main() -> None:
                 running = False
 
         screen.fill("black")
-        Draw(screen=screen, border_size=1, shape="rect")
+        Draw(screen=screen, border_size=1, shape=Shape.RECT)
         board.update_cells()
         pygame.display.flip()
         time.sleep(0.1)
 
 
 class Draw:
-    def __init__(self, screen: pygame.Surface, border_size: int, shape: str) -> None:
+    def __init__(self, screen: pygame.Surface, border_size: int, shape: Shape) -> None:
         self.screen = screen
         self.border_size = border_size
         self.shape = shape
@@ -41,9 +47,9 @@ class Draw:
                 cell = Grid.cells[x][y]
                 x_position = x * self.cell_width
                 y_position = y * self.cell_height
-                if self.shape == "rect":
+                if self.shape == Shape.RECT:
                     self.draw_rect(cell, x_position, y_position)
-                if self.shape == "circle":
+                if self.shape == Shape.CIRCLE:
                     self.draw_circle(cell, x_position, y_position)
 
     def draw_circle(self, cell: Cell, x_pos: int, y_pos: int) -> None:
