@@ -1,7 +1,7 @@
 from cell import Cell, Status
 from dataclasses import dataclass
 from random import randint
-from presets import GOSPER_GLIDER
+from presets import Preset
 
 
 @dataclass
@@ -22,7 +22,9 @@ def bound(value: int, low: int, high: int) -> int:
 
 
 class World:
-    def __init__(self, dimensions: tuple[int, int], stages: bool, preset: bool) -> None:
+    def __init__(
+        self, dimensions: tuple[int, int], stages: bool, preset: Preset
+    ) -> None:
         self.stages = stages
         Grid.width, Grid.height = dimensions
         Grid.cells = [
@@ -30,7 +32,7 @@ class World:
             for column in range(Grid.height)
         ]
         if preset:
-            self.generate_preset(preset=GOSPER_GLIDER)
+            self.generate_preset(preset=preset)
         else:
             self.generate_random()
 
@@ -75,8 +77,8 @@ class World:
         dead = []
         for offset in offsets:
             position = [
-                bound(value=x + offset[0], low=0, high=Grid.width - 1),
-                bound(value=y + offset[1], low=0, high=Grid.height - 1),
+                bound(value=x + offset[0], low=0, high=Grid.height - 1),
+                bound(value=y + offset[1], low=0, high=Grid.width - 1),
             ]
             neighbor = Grid.cells[position[0]][position[1]]
             if neighbor.status == Status.ALIVE or neighbor.status == Status.BORN:
