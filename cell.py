@@ -4,8 +4,8 @@ from enum import Enum
 
 class Status(Enum):
     DEAD: tuple = (0, 0, 0)
-    DYING: tuple = (234, 153, 153)
-    BORN: tuple = (182, 215, 168)
+    DYING: tuple = (101, 64, 64)
+    BORN: tuple = (217, 234, 211)
     ALIVE: tuple = (255, 255, 255)
 
 
