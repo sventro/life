@@ -1,5 +1,6 @@
 import pygame
 import time
+from presets import Preset
 from world import World, Grid
 from cell import Cell
 from enum import Enum
@@ -12,8 +13,8 @@ class Shape(Enum):
 
 def main() -> None:
     pygame.init()
-    screen = pygame.display.set_mode((600, 600))
-    board = World(dimensions=[40, 40], stages=True, preset=False)
+    screen = pygame.display.set_mode((1000, 500))
+    board = World(dimensions=[100, 50], stages=True, preset=Preset.GOSPER_GLIDER.value)
 
     running = True
     while running:
