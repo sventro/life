@@ -74,15 +74,15 @@ class World:
         alive = []
         dead = []
         for offset in offsets:
-            neighbor = [
+            position = [
                 bound(value=x + offset[0], low=0, high=Grid.width - 1),
                 bound(value=y + offset[1], low=0, high=Grid.height - 1),
             ]
-            cell = Grid.cells[neighbor[0]][neighbor[1]]
-            if cell.status == Status.ALIVE or cell.status == Status.BORN:
-                alive.append(cell)
-            elif cell.status == Status.DEAD or cell.status == Status.DYING:
-                dead.append(cell)
+            neighbor = Grid.cells[position[0]][position[1]]
+            if neighbor.status == Status.ALIVE or neighbor.status == Status.BORN:
+                alive.append(neighbor)
+            elif neighbor.status == Status.DEAD or neighbor.status == Status.DYING:
+                dead.append(neighbor)
             else:
-                dead.append(cell)
+                dead.append(neighbor)
         return Neighbors(alive=alive, dead=dead)
