@@ -48,13 +48,18 @@ def bound(value: int, low: int, high: int) -> int:
 
 class World:
     def __init__(
-        self, dimensions: tuple[int, int], stages: bool, preset: Preset
+        self,
+        dimensions: tuple[int, int],
+        stages: bool,
+        preset: Preset,
+        neighborhood: Neighborhood,
     ) -> None:
         self.stages = stages
+        self.neighborhood = neighborhood
         Grid.width, Grid.height = dimensions
         Grid.cells = [
-            [Cell(position=[row, column]) for column in range(Grid.height)]
-            for row in range(Grid.width)
+            [Cell(position=[column, row]) for row in range(Grid.height)]
+            for column in range(Grid.width)
         ]
         if preset:
             self.generate_preset(preset=preset)
@@ -74,33 +79,33 @@ class World:
                 if cell.position in preset:
                     cell.status = Status.ALIVE
 
-    def update_cells(self) -> None:
+    def update_cells(self, running: bool = True) -> None:
         dies: Cell = []
         born: Cell = []
-        for row, _ in enumerate(Grid.cells):
-            for column, _ in enumerate(Grid.cells[row]):
-                cell = Grid.cells[row][column]
-                neighbors = self.check_neighbors(row, column)
-                if cell.status == Status.BORN:
-                    cell.status = Status.ALIVE
-                if cell.status == Status.DYING:
-                    cell.status = Status.DEAD
-                if cell.status == Status.ALIVE:
-                    if len(neighbors.alive) not in [2, 3]:
-                        dies.append(cell)
-                if cell.status == Status.DEAD:
-                    if len(neighbors.alive) == 3:
-                        born.append(cell)
-        for cell in dies:
-            cell.status = Status.DYING if self.stages else Status.DEAD
-        for cell in born:
-            cell.status = Status.BORN if self.stages else Status.ALIVE
+        if running:
+            for row, _ in enumerate(Grid.cells):
+                for column, _ in enumerate(Grid.cells[row]):
+                    cell = Grid.cells[row][column]
+                    neighbors = self.check_neighbors(row, column)
+                    if cell.status == Status.BORN:
+                        cell.status = Status.ALIVE
+                    if cell.status == Status.DYING:
+                        cell.status = Status.DEAD
+                    if cell.status == Status.ALIVE:
+                        if len(neighbors.alive) not in [2, 3]:
+                            dies.append(cell)
+                    if cell.status == Status.DEAD:
+                        if len(neighbors.alive) == 3:
+                            born.append(cell)
+            for cell in dies:
+                cell.status = Status.DYING if self.stages else Status.DEAD
+            for cell in born:
+                cell.status = Status.BORN if self.stages else Status.ALIVE
 
     def check_neighbors(self, x: int, y: int) -> Neighbors:
-        offsets = [(-1, -1), (0, -1), (1, -1), (-1, 0), (1, 0), (-1, 1), (0, 1), (1, 1)]
         alive = []
         dead = []
-        for offset in offsets:
+        for offset in self.neighborhood:
             position = [
                 bound(value=x + offset[0], low=0, high=Grid.width - 1),
                 bound(value=y + offset[1], low=0, high=Grid.height - 1),
