@@ -5,7 +5,7 @@ from cell import Cell, Status
 from presets import Preset
 
 
-@dataclass
+@dataclass(slots=True)
 class Grid:
     width: int
     height: int

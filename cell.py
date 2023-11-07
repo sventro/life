@@ -9,7 +9,7 @@ class Status(Enum):
     ALIVE: tuple = (255, 255, 255)
 
 
-@dataclass
+@dataclass(slots=True)
 class Cell:
     status: Status = Status.DEAD
     position: tuple[int, int] = (0, 0)

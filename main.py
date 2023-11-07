@@ -18,7 +18,7 @@ def main() -> None:
     board = World(
         dimensions=[int(width * 0.1), int(height * 0.1)],
         stages=True,
-        preset=Preset.EMPTY.value,
+        preset=Preset.RANDOM.value,
         neighborhood=Neighborhood.MOORE.value,
     )
 
