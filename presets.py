@@ -2,6 +2,8 @@ from enum import Enum
 
 
 class Preset(Enum):
+    RANDOM = None
+    EMPTY = [[]]
     R_PENTOMINO = [
         [20, 20],
         [21, 20],

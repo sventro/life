@@ -1,9 +1,9 @@
 import pygame
 import time
-from presets import Preset
-from world import World, Grid
-from cell import Cell
 from enum import Enum
+from presets import Preset
+from world import World, Grid, Neighborhood
+from cell import Cell, Status
 
 
 class Shape(Enum):
@@ -13,21 +13,55 @@ class Shape(Enum):
 
 def main() -> None:
     pygame.init()
-    screen = pygame.display.set_mode((1000, 500))
-    # for random: preset=None
-    board = World(dimensions=[100, 50], stages=True, preset=Preset.R_PENTOMINO.value)
+    width, height = [1000, 500]
+    screen = pygame.display.set_mode((width, height))
+    board = World(
+        dimensions=[int(width * 0.1), int(height * 0.1)],
+        stages=True,
+        preset=Preset.EMPTY.value,
+        neighborhood=Neighborhood.MOORE.value,
+    )
 
-    running = True
-    while running:
+    running = False
+    while True:
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
-                running = False
+                pygame.quit()
+                return
+            elif event.type == pygame.KEYDOWN and event.key == pygame.K_SPACE:
+                running = not running
+            if event.type == pygame.MOUSEBUTTONDOWN or pygame.mouse.get_pressed()[0]:
+                toggle_cells(add=True)
+            if pygame.key.get_pressed()[pygame.K_LCTRL]:
+                if (
+                    event.type == pygame.MOUSEBUTTONDOWN
+                    or pygame.mouse.get_pressed()[0]
+                ):
+                    toggle_cells(add=False)
+            if event.type == pygame.KEYDOWN and event.key == pygame.K_RETURN:
+                print(generate_preset())
 
-        screen.fill("black")
+        screen.fill("grey40")
         Draw(screen=screen, border_size=1, shape=Shape.RECT)
-        board.update_cells()
+        board.update_cells(running=running)
         pygame.display.flip()
-        time.sleep(0.1)
+        time.sleep(0.03)
+
+
+def toggle_cells(add: bool):
+    x, y = pygame.mouse.get_pos()
+    cell = Grid.cells[int(x * 0.1)][int(y * 0.1)]
+    cell.status = Status.ALIVE if add else Status.DEAD
+
+
+def generate_preset():
+    preset = []
+    for x, _ in enumerate(Grid.cells):
+        for y, _ in enumerate(Grid.cells[x]):
+            cell = Grid.cells[x][y]
+            if cell.status is Status.ALIVE:
+                preset.append(cell.position)
+    return preset
 
 
 class Draw:

@@ -1,6 +1,7 @@
-from cell import Cell, Status
 from dataclasses import dataclass
+from enum import Enum
 from random import randint
+from cell import Cell, Status
 from presets import Preset
 
 
@@ -11,10 +12,34 @@ class Grid:
     cells: list[list[Cell]]
 
 
-@dataclass
+@dataclass(slots=True)
 class Neighbors:
     alive: Cell
     dead: Cell
+
+
+class Neighborhood(Enum):
+    MOORE: list[tuple[int, int]] = [
+        (-1, -1),
+        (0, -1),
+        (1, -1),
+        (-1, 0),
+        (1, 0),
+        (-1, 1),
+        (0, 1),
+        (1, 1),
+    ]
+    VON_NEUMANN: list[tuple[int, int]] = [(0, -1), (-1, 0), (1, 0), (0, 1)]
+    VON_NEUMANN2: list[tuple[int, int]] = [
+        (0, -1),
+        (0, -2),
+        (-1, 0),
+        (-2, 0),
+        (1, 0),
+        (2, 0),
+        (0, 1),
+        (0, 2),
+    ]
 
 
 def bound(value: int, low: int, high: int) -> int:
