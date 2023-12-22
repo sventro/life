@@ -13,3 +13,16 @@ class Status(Enum):
 class Cell:
     status: Status = Status.DEAD
     position: tuple[int, int] = (0, 0)
+
+
+@dataclass(slots=True)
+class Neighbors:
+    alive: Cell
+    dead: Cell
+
+
+class Neighborhood(Enum):
+    ELEMENTARY = [[-1, 1], [0, 1], [1, 1]]
+    MOORE = [(-1, -1), (0, -1), (1, -1), (-1, 0), (1, 0), (-1, 1), (0, 1), (1, 1)]
+    VON_NEUMANN = [(0, -1), (-1, 0), (1, 0), (0, 1)]
+    VON_NEUMANN2 = [(0, -1), (0, -2), (-1, 0), (-2, 0), (1, 0), (2, 0), (0, 1), (0, 2)]

@@ -1,27 +1,30 @@
 import pygame
 import time
-from enum import Enum
+from enum import StrEnum, auto
 from presets import Preset
 from world import World, Grid, Neighborhood
 from cell import Cell, Status
 
+WIDTH, HEIGHT = [800, 600]
+CELL_SCALING_FACTOR = 0.1
+CELL_BORDER_SIZE = 1
+FRAMERATE = 30
 
-class Shape(Enum):
-    RECT: str = "rect"
-    CIRCLE: str = "circle"
+
+class Shape(StrEnum):
+    RECT: str = auto()
+    CIRCLE: str = auto()
 
 
 def main() -> None:
-    pygame.init()
-    width, height = [1000, 500]
-    screen = pygame.display.set_mode((width, height))
-    board = World(
-        dimensions=[int(width * 0.1), int(height * 0.1)],
+    dimensions = [int(WIDTH * CELL_SCALING_FACTOR), int(HEIGHT * CELL_SCALING_FACTOR)]
+    screen = pygame.display.set_mode((WIDTH, HEIGHT))
+    world = World(
+        dimensions=dimensions,
         stages=True,
-        preset=Preset.RANDOM.value,
+        preset=Preset.R_PENTOMINO.value,
         neighborhood=Neighborhood.MOORE.value,
     )
-
     running = False
     while True:
         for event in pygame.event.get():
@@ -41,24 +44,25 @@ def main() -> None:
             if event.type == pygame.KEYDOWN and event.key == pygame.K_RETURN:
                 print(generate_preset())
 
-        screen.fill("grey40")
-        Draw(screen=screen, border_size=1, shape=Shape.RECT)
-        board.update_cells(running=running)
+        screen.fill("grey8")
+        Draw(screen=screen, border_size=CELL_BORDER_SIZE, shape=Shape.RECT)
+        world.update_cells(running=running)
         pygame.display.flip()
-        time.sleep(0.03)
+        time.sleep(1 / FRAMERATE)
 
 
 def toggle_cells(add: bool):
     x, y = pygame.mouse.get_pos()
-    cell = Grid.cells[int(x * 0.1)][int(y * 0.1)]
+    row = int(x * CELL_SCALING_FACTOR)
+    column = int(y * CELL_SCALING_FACTOR)
+    cell = Grid.cells[row][column]
     cell.status = Status.ALIVE if add else Status.DEAD
 
 
 def generate_preset():
     preset = []
-    for x, _ in enumerate(Grid.cells):
-        for y, _ in enumerate(Grid.cells[x]):
-            cell = Grid.cells[x][y]
+    for row in Grid.cells:
+        for cell in row:
             if cell.status is Status.ALIVE:
                 preset.append(cell.position)
     return preset
@@ -75,31 +79,32 @@ class Draw:
         self.width = self.cell_width - border_size
         self.height = self.cell_height - border_size
 
-        self.draw_world()
+        self.__world()
 
-    def draw_world(self) -> None:
+    def __world(self) -> None:
         for x, _ in enumerate(Grid.cells):
             for y, _ in enumerate(Grid.cells[x]):
                 cell = Grid.cells[x][y]
-                x_position = x * self.cell_width
-                y_position = y * self.cell_height
+                position = [x * self.cell_width, y * self.cell_height]
                 if self.shape == Shape.RECT:
-                    self.draw_rect(cell, x_position, y_position)
+                    self.__rect(cell, position)
                 if self.shape == Shape.CIRCLE:
-                    self.draw_circle(cell, x_position, y_position)
+                    self.__circle(cell, position)
 
-    def draw_circle(self, cell: Cell, x_pos: int, y_pos: int) -> None:
+    def __circle(self, cell: Cell, position: tuple[int, int]) -> None:
         radius = self.width / 2
-        center_x = x_pos + radius + self.border_size
-        center_y = y_pos + radius + self.border_size
+        center_x = position[0] + radius + self.border_size
+        center_y = position[1] + radius + self.border_size
         pygame.draw.circle(self.screen, cell.status.value, (center_x, center_y), radius)
 
-    def draw_rect(self, cell: Cell, x_pos: int, y_pos: int) -> None:
-        left = x_pos + self.border_size
-        top = y_pos + self.border_size
+    def __rect(self, cell: Cell, position: tuple[int, int]) -> None:
+        left = position[0] + self.border_size
+        top = position[1] + self.border_size
         rect = (left, top, self.width, self.height)
         pygame.draw.rect(self.screen, cell.status.value, rect)
 
 
 if __name__ == "__main__":
+    pygame.init()
+    pygame.display.set_caption("Conway's Game of Life")
     main()
